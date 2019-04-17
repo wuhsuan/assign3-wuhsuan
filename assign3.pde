@@ -7,13 +7,30 @@ final int START_BUTTON_H = 60;
 final int START_BUTTON_X = 248;
 final int START_BUTTON_Y = 360;
 
+final int SOIL_WIDTH=80;
+final int SOIL_HIGHT=80;
+
+int hogX=320;
+int hogY=80;
+int hogMove=80;
+
+int lifeX;
+int lifeY=10;
+
+PImage[]soilImg;
+PImage stone1,stone2;
 PImage title, gameover, startNormal, startHovered, restartNormal, restartHovered;
-PImage bg, soil8x24;
+PImage groundHog,imgLife;
+PImage bg;
+
 
 // For debug function; DO NOT edit or remove this!
 int playerHealth = 0;
 float cameraOffsetY = 0;
 boolean debugMode = false;
+
+boolean hogPress=false;
+float moveRangeY=0;
 
 void setup() {
 	size(640, 480, P2D);
@@ -25,7 +42,15 @@ void setup() {
 	startHovered = loadImage("img/startHovered.png");
 	restartNormal = loadImage("img/restartNormal.png");
 	restartHovered = loadImage("img/restartHovered.png");
-	soil8x24 = loadImage("img/soil8x24.png");
+  groundHog=loadImage("img/groundhogIdle.png");
+  stone1=loadImage("img/stone1.png");
+  stone2=loadImage("img/stone2.png");
+  imgLife=loadImage("img/life.png");
+	
+  soilImg=new PImage[6];
+  for (int i=0; i<6 ; i++){
+    soilImg[i]=loadImage("img/soil"+i+".png");
+  }
 }
 
 void draw() {
@@ -40,8 +65,11 @@ void draw() {
       translate(0, cameraOffsetY);
     }
     /* ------ End of Debug Function ------ */
-
     
+    
+    
+ 
+  
 	switch (gameState) {
 
 		case GAME_START: // Start Screen
@@ -81,12 +109,81 @@ void draw() {
 		noStroke();
 		rect(0, 160 - GRASS_HEIGHT, width, GRASS_HEIGHT);
 
+             
+    
+
+    
 		// Soil - REPLACE THIS PART WITH YOUR LOOP CODE!
-		image(soil8x24, 0, 160);
+		for (int i=0 ; i<8 ; i++){      
+      for (int h=2 ; h<26 ; h++){ 
+        if(h<6){
+          image(soilImg[0],80*i,80*h);
+        }        
+        if(h>5 && h<10){
+          image(soilImg[1],80*i,80*h);
+        }
+        if(h>9 && h<14){         
+          image(soilImg[2],80*i,80*h);
+        }
+        if(h>13 && h<18){
+          image(soilImg[3],80*i,80*h);
+        }
+        if(h>17 && h<22){
+          image(soilImg[4],80*i,80*h);
+        }
+        if(h>21 && h<26){
+          image(soilImg[5],80*i,80*h);
+      }
+      
+      }
+            
+    }
+    
+    //stone
+    //1-8
+    for(int i=0 ; i<8 ; i++){
+      image(stone1,80*i,80*(i+2));
+    }
+    //9-16
+    for(int i=-3 ; i<8 ; i+=4){   
+      for(int h=0 ; h<8 ; h+=4){
+      image(stone1,80*i,80*(h+11));
+      image(stone1,80*(i+1),80*(h+12));
+      }
+    }
+    
+    for(int i=1 ; i<8 ; i+=4){  
+      for(int h=0 ; h<8 ;h+=4){
+      image(stone1,80*i,80*(h+10));
+      image(stone1,80*(i+1),80*(h+13));
+      }
+    }
+    /*
+    //17-24
+    for(int i=0 ; i<8 ; i++){     
+        for(int a=1 ; a<8 ;a++ )
+      image(stone1,80*i+a,80*y+a);      
+    }        
+    for(int i=0 ; i<8 ; i++){
+      for(int a=2;a<)
+      image(stone1,80*i,80*i);
+    }
+    */
+      
+      
 
 		// Player
-
+    image(groundHog,hogX,hogY);
+    
+  
+   
+    
+        
+      
 		// Health UI
+      for(int i=0 ; i<5 ; i++){
+        image(imgLife,10+70*i,lifeY);
+      }
 
 		break;
 
@@ -142,6 +239,29 @@ void keyPressed(){
       if(playerHealth < 5) playerHealth ++;
       break;
     }
+    
+    //groundHug
+    switch(keyCode){
+      case UP:        
+        hogY-=hogMove;        
+        if(hogY<80) hogY=80;
+      break;
+      case DOWN:
+        hogPress=true;
+        moveRangeY +=80;
+        hogY+=hogMove;
+        if(hogY>height-80) hogY=height-80;
+      break;
+      case RIGHT:     
+        hogX+=hogMove;        
+        if(hogX>width-80) hogX=width-80; 
+      break;
+      case LEFT:
+        hogX-=hogMove;
+        if(hogX<0) hogX=0;
+      break;
+    }
+    
 }
 
 void keyReleased(){
