@@ -236,7 +236,7 @@ void draw() {
      if(viewY>=80*20){
           viewY=80*20;
           hogY+=5;
-          image(down,hogX,hogY);
+          
             if(hogY%80==0){
               moveState=STOP;
               }
