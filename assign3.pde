@@ -10,9 +10,14 @@ final int START_BUTTON_Y = 360;
 final int SOIL_WIDTH=80;
 final int SOIL_HIGHT=80;
 
+final int   STOP=0, HOG_DOWN=1 , HOG_LEFT=2 , HOG_RIGHT=3;
+int moveState=0;
+boolean hogDown;
+
+
 int hogX=320;
 int hogY=80;
-int hogMove=80;
+
 
 int lifeX;
 int lifeY=10;
@@ -20,17 +25,18 @@ int lifeY=10;
 PImage[]soilImg;
 PImage stone1,stone2;
 PImage title, gameover, startNormal, startHovered, restartNormal, restartHovered;
-PImage groundHog,imgLife;
+PImage groundHog,down,left,right,imgLife;
 PImage bg;
 
 
 // For debug function; DO NOT edit or remove this!
-int playerHealth = 0;
+int playerHealth = 2;
 float cameraOffsetY = 0;
 boolean debugMode = false;
 
 boolean hogPress=false;
 float moveRangeY=0;
+int viewY;
 
 void setup() {
 	size(640, 480, P2D);
@@ -42,9 +48,15 @@ void setup() {
 	startHovered = loadImage("img/startHovered.png");
 	restartNormal = loadImage("img/restartNormal.png");
 	restartHovered = loadImage("img/restartHovered.png");
+
   groundHog=loadImage("img/groundhogIdle.png");
+  down=loadImage("img/groundhogDown.png");
+  left=loadImage("img/groundhogLeft.png");
+  right=loadImage("img/groundhogRight.png");
+  
   stone1=loadImage("img/stone1.png");
   stone2=loadImage("img/stone2.png");
+  
   imgLife=loadImage("img/life.png");
 	
   soilImg=new PImage[6];
@@ -108,31 +120,28 @@ void draw() {
 		fill(124, 204, 25);
 		noStroke();
 		rect(0, 160 - GRASS_HEIGHT, width, GRASS_HEIGHT);
-
-             
-    
-
+                 
     
 		// Soil - REPLACE THIS PART WITH YOUR LOOP CODE!
 		for (int i=0 ; i<8 ; i++){      
-      for (int h=2 ; h<26 ; h++){ 
+      for (int h=2 ; h<27 ; h++){ 
         if(h<6){
-          image(soilImg[0],80*i,80*h);
+          image(soilImg[0],80*i,80*h-viewY);
         }        
         if(h>5 && h<10){
-          image(soilImg[1],80*i,80*h);
+          image(soilImg[1],80*i,80*h-viewY);
         }
         if(h>9 && h<14){         
-          image(soilImg[2],80*i,80*h);
+          image(soilImg[2],80*i,80*h-viewY);
         }
         if(h>13 && h<18){
-          image(soilImg[3],80*i,80*h);
+          image(soilImg[3],80*i,80*h-viewY);
         }
         if(h>17 && h<22){
-          image(soilImg[4],80*i,80*h);
+          image(soilImg[4],80*i,80*h-viewY);
         }
         if(h>21 && h<26){
-          image(soilImg[5],80*i,80*h);
+          image(soilImg[5],80*i,80*h-viewY);
       }
       
       }
@@ -141,39 +150,126 @@ void draw() {
     
     //stone
     //1-8
+    
     for(int i=0 ; i<8 ; i++){
-      image(stone1,80*i,80*(i+2));
+     float x=i*80;
+     float y=80*2+80*i;
+     image(stone1,x,y-viewY);
     }
     //9-16
-    for(int i=-3 ; i<8 ; i+=4){   
-      for(int h=0 ; h<8 ; h+=4){
-      image(stone1,80*i,80*(h+11));
-      image(stone1,80*(i+1),80*(h+12));
-      }
+    for(int w=0 ; w<8 ; w+=7){
+       for(int i=0 ; i<8 ; i+=4){
+          float x1=80+i*80;
+          float x2=x1+80;
+          float y1=80*(8+w+2);         
+          image(stone1,x1,y1-viewY);
+          image(stone1,x2,y1-viewY);        
+        }
     }
+        for(int w=0 ; w<8 ; w+=4){
+         for(int i=0 ; i<12 ; i+=4){
+          float x1=-80+i*80;
+          float x2=x1+80;
+          float y1=80*(9+w+2);   
+          float y2=y1+80; 
+          image(stone1,x1,y1-viewY);
+          image(stone1,x2,y1-viewY); 
+          image(stone1,x1,y2-viewY);
+          image(stone1,x2,y2-viewY);   
+          }
+        }
+        
+        for(int i=0 ; i<8 ; i+=4){
+          float x1=80+i*80;
+          float x2=x1+80;
+          float y1=80*(11+2);
+          float y2=y1+80; 
+          image(stone1,x1,y1-viewY);
+          image(stone1,x2,y1-viewY);  
+          image(stone1,x1,y2-viewY);
+          image(stone1,x2,y2-viewY);  
+        }
+
+                                           
+    //17-24    
+  for(int w=-6;w<8;w+=3){  
+    for(int i=0; i<8; i++){     
+      float x=i*80+80*w;
+      float y=80*25-80*i;     
+      image(stone1,x,y-viewY);      
+     }
+  }
+  for(int w=-5;w<8;w+=3){  
+    for(int i=0; i<8; i++){     
+      float x=i*80+80*w;
+      float y=80*25-80*i;     
+      image(stone1,x,y-viewY);      
+     }
+  }
+  for(int w=-5;w<8;w+=3){  
+    for(int i=0; i<8; i++){     
+      float x=i*80+80*w;
+      float y=80*25-80*i;     
+      image(stone2,x,y-viewY);      
+     }
+  }
+     
     
-    for(int i=1 ; i<8 ; i+=4){  
-      for(int h=0 ; h<8 ;h+=4){
-      image(stone1,80*i,80*(h+10));
-      image(stone1,80*(i+1),80*(h+13));
-      }
-    }
-    /*
-    //17-24
-    for(int i=0 ; i<8 ; i++){     
-        for(int a=1 ; a<8 ;a++ )
-      image(stone1,80*i+a,80*y+a);      
-    }        
-    for(int i=0 ; i<8 ; i++){
-      for(int a=2;a<)
-      image(stone1,80*i,80*i);
-    }
-    */
       
       
 
 		// Player
-    image(groundHog,hogX,hogY);
+    
+    
+    switch(moveState){
+      
+      case  STOP:
+      image(groundHog,hogX,hogY);
+      break;
+      
+      case HOG_DOWN: 
+            
+     if(hogDown){
+       image(down,hogX,hogY);
+     }else{ image(groundHog,hogX,hogY);
+     }
+             
+     if(viewY>=80*20){
+          viewY=80*20;
+          hogY+=5;
+            if(hogY%80==0){
+              moveState=STOP;
+              }
+        }   
+        
+      if(hogY>height-80) hogY=height-80;
+      /*
+      if(hogY%80==0){
+        moveState=STOP;
+        image(down,hogX,hogY-80);
+      }
+      */
+      
+      break;
+      
+      case  HOG_LEFT:
+      image(left,hogX,hogY);
+      hogX-=5;
+      if(hogX%80==0){
+        moveState=STOP;
+      }
+      if(hogX<0) hogX=width-80;
+      break;
+      
+      case HOG_RIGHT:
+      image(right,hogX,hogY);
+      hogX+=5;
+      if(hogX%80==0){
+        moveState=STOP;
+      }
+      if(hogX>width-80) hogX=0; 
+      break;
+    }
     
   
    
@@ -181,7 +277,7 @@ void draw() {
         
       
 		// Health UI
-      for(int i=0 ; i<5 ; i++){
+      for(int i=0 ; i<playerHealth  ; i++){
         image(imgLife,10+70*i,lifeY);
       }
 
@@ -241,28 +337,30 @@ void keyPressed(){
     }
     
     //groundHug
-    switch(keyCode){
-      case UP:        
-        hogY-=hogMove;        
-        if(hogY<80) hogY=80;
+    switch(keyCode){           
+      case DOWN:      
+      moveState=HOG_DOWN;
+      viewY +=80;  
+      hogDown=true;
       break;
-      case DOWN:
-        hogPress=true;
-        moveRangeY +=80;
-        hogY+=hogMove;
-        if(hogY>height-80) hogY=height-80;
+      
+      case RIGHT:   
+      moveState=HOG_RIGHT;          
+        
       break;
-      case RIGHT:     
-        hogX+=hogMove;        
-        if(hogX>width-80) hogX=width-80; 
-      break;
+      
       case LEFT:
-        hogX-=hogMove;
-        if(hogX<0) hogX=0;
+      moveState=HOG_LEFT;       
+        
       break;
     }
     
 }
 
 void keyReleased(){
+  switch(keyCode){
+    case DOWN:
+    hogDown=false;
+    break;
+  }
 }
