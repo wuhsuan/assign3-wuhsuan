@@ -36,7 +36,7 @@ boolean debugMode = false;
 
 boolean hogPress=false;
 float moveRangeY=0;
-int viewY;
+int viewY=0;
 
 void setup() {
 	size(640, 480, P2D);
@@ -235,8 +235,7 @@ void draw() {
        }             
      if(viewY>=80*20){
           viewY=80*20;
-          hogY+=5;
-          
+          hogY+=5;          
             if(hogY%80==0){
               moveState=STOP;
               }
@@ -340,8 +339,8 @@ void keyPressed(){
     switch(keyCode){           
       case DOWN:      
       moveState=HOG_DOWN;
-      viewY +=80;  
       hogDown=true;
+      if(viewY<80*20){viewY +=80;   }     
       break;
       
       case RIGHT:   
